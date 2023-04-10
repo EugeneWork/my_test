@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RecoverPasswordRequest;
-use App\Http\Requests\ResetPasswordRequest;
-use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Services\AuthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -24,39 +22,39 @@ class AuthController extends Controller
 
     }
 
-
-    public function store(Request $request): JsonResponse
+    /**
+     * @param StoreUserRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = $this->authService->register([
-            'first_name' => $request->get('first_name'),
-            'last_name' => $request->get('last_name'),
-            'email' => $request->get('email'),
-            'phone' => $request->get('phone'),
-            'password' => Hash::make($request->get('password')),
-        ]);
+        $user = $this->authService->register($request->only('name', 'email', 'phone', 'address', 'password'));
         if ($user['status'] == 'Success') {
             return $this->responseSuccess('Success', ['user' => $user['body']]);
         }
         return $this->responseServerError($user['message']);
     }
 
-
-    public function login(Request $request): JsonResponse
+    /**
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request): JsonResponse
     {
-        $login = $this->authService->login([
-            'email' => $request->get('email'),
-            'password' => $request->get('password'),
-        ]);
+        $login = $this->authService->login($request->only('email', 'password'));
         if ($login['status'] == 'Success') {
             return $this->responseSuccess('Success', ['user' => $login['body']]);
         }
         return $this->responseNotFound($login['message']);
     }
 
-
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function logout(Request $request): JsonResponse
     {
-        $logout = $this->authService->logout($request->user->api_token);
+        $logout = $this->authService->logout($request);
         if ($logout['status'] == 'Success') {
             return $this->responseSuccess('Success', $logout['body']);
         }

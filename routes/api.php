@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
+Route::post('register', [\App\Http\Controllers\AuthController::class, 'store']);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout']);
+    Route::get('wallets', [\App\Http\Controllers\WalletController::class, 'index']);
+    Route::post('wallets', [\App\Http\Controllers\WalletController::class, 'store']);
+    Route::post('payment/top-up', [\App\Http\Controllers\PaymentController::class, 'store']);
+    Route::post('payment/withdraw', [\App\Http\Controllers\PaymentController::class, 'store']);
+    Route::get('payment/history', [\App\Http\Controllers\PaymentController::class, 'index']);
+    Route::get('currencies', [\App\Http\Controllers\CurrencyController::class, 'index']);
 });

@@ -4,7 +4,6 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\PaymentHistory;
 use App\Repositories\PaymentRepositoryInterface;
-use Illuminate\Database\Eloquent\Model;
 
 class PaymentRepository extends BaseRepository implements PaymentRepositoryInterface
 {

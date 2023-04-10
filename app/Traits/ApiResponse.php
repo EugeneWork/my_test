@@ -46,7 +46,7 @@ trait ApiResponse
             'status' => 404,
             'message' => $message,
             'errors' => $errors,
-        ], 200);
+        ], 404);
     }
 
     /**

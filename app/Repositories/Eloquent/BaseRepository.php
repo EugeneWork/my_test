@@ -102,7 +102,7 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function where(string $field_name, $field_value, string $operator = '='): ?Builder
     {
-        return $this->model->where($field_name, $operator, $field_value);
+        return $this->model->with($this->relations)->where($field_name, $operator, $field_value);
     }
 
 }
