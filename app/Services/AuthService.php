@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Repositories\UserRepositoryInterface;
 use App\Traits\ServiceResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-
 
 class AuthService
 {
@@ -25,6 +23,7 @@ class AuthService
      */
     public function register($attributes): array
     {
+        $attributes['password'] = Hash::make($attributes['password']);
         $user = $this->userRepository->create($attributes);
         if ($user->id) {
             return $this->success($user);
@@ -39,28 +38,24 @@ class AuthService
      */
     public function login($attributes): array
     {
-        $user = $this->userRepository->getByEmail($attributes['email']);
+        $user = $this->userRepository->where('email', $attributes['email'])->first();
         if ($user) {
             if (Hash::check($attributes['password'], $user->password)) {
-                $user = $this->userRepository->updateApiToken($user, Str::random(64));
-                return $this->success($user);
+                return $this->success($user->createToken("API TOKEN")->plainTextToken);
             }
             return $this->error("Wrong password");
         }
         return $this->error("Wrong email");
     }
 
+
     /**
-     * @param $token
+     * @param $request
      * @return array
      */
-    public function logout($token): array
+    public function logout($request): array
     {
-        $user = $this->userRepository->getByApiToken($token);
-        if ($user) {
-            $user = $user->update(['api_token' => null]);
-            return $this->success($user);
-        }
-        return $this->error("Wrong token");
+        $user = $request->user()->currentAccessToken()->delete();
+        return $this->success($user);
     }
 }

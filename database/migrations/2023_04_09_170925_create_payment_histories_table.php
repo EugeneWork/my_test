@@ -20,6 +20,7 @@ class CreatePaymentHistoriesTable extends Migration
             $table->unsignedBigInteger('wallet_id');
             $table->foreign('wallet_id')->references('id')->on('wallets');
             $table->enum('operation', ['withdraw', 'top_up']);
+            $table->string('value');
             $table->timestamps();
         });
     }
